@@ -2,6 +2,28 @@
 
 # DevOps-Interview-Questions
 
+Here’s what I ask 👇
+1. How does DNS resolution work inside a pod?
+→ And what’s the first thing you check when a service isn’t reachable by name?
+
+2. Please walk me through the controller manager’s role during a Deployment.
+→ Not just kubectl rollout status — I want the reconciliation logic.
+
+3. What happens if a node with local storage gets autoscaled down?
+→ Hint: this is where most real prod data loss stories begin.
+
+4. Post-deploy, latency spikes for 30% of users. No errors. No logs. No alerts.
+→ What’s your 3-step triage?
+
+5. How do you enforce runtime security in Kubernetes?
+→ PSP? AppArmor? OPA? Or… just crossing fingers?
+
+6. HPA vs VPA vs Karpenter — when would you NOT use each?
+→ Bonus: How do you simulate HPA behavior in staging?
+
+7. Tell me about the last Kubernetes outage you debugged.
+→ No postmortem? You probably weren’t in the war room.
+
 Round 1 – Systems at Scale, K8s, Cloud & Linux (45 mins)
 • How would you implement fine-grained service discovery across 1000+ microservices using Envoy or Istio?
 • Explain how you’d leverage eBPF + Cilium to enforce network security policies at runtime, and what the advantages are over traditional CNIs?
