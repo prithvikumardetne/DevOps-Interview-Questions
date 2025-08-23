@@ -2,6 +2,40 @@
 
 # DevOps-Interview-Questions
 
+1️⃣ You mentioned you’ve worked with Argo CD – how do you use it?
+
+2️⃣ There’s a scenario where someone wants to deploy infrastructure on AWS via Terraform. Which tool will you use and why?
+
+3️⃣ How do you maintain Argo CD and use it to deploy on Kubernetes?
+
+4️⃣ How do you manage rollbacks of an application in Argo CD?
+
+5️⃣ In Kubernetes, how many master and worker nodes you had configure?
+
+6️⃣ Would you use an entirely different AWS account, a separate cluster, or just a namespace to differentiate Dev and Prod?
+
+7️⃣ If you have 1 master node and 1 worker node running an application, how would you upgrade Kubernetes on both?
+
+8️⃣ Do you store your Terraform state file locally or remotely? Why?
+
+9️⃣ If you deployed 12 EC2 instances and 2 were deleted manually, what happens when you run terraform apply again?
+
+🔟 How do you update your Terraform state file to match current AWS resources? Which command will you use?
+
+1️⃣1️⃣ How would you deploy to multiple AWS accounts like Dev, UAT, and Prod?
+
+1️⃣2️⃣ Can we do it with Terraform workspaces?
+
+1️⃣3️⃣ What does terraform init do?
+
+1️⃣4️⃣ If an EC2 instance has an IAM role to access S3 but gets “Permission Denied,” how do you troubleshoot?
+
+1️⃣5️⃣ You use ALB for EKS external traffic – how do you manage traffic inside EKS to different paths?
+
+1️⃣6️⃣ For cost optimization, how do AWS Savings Plans work?
+
+1️⃣7️⃣ You use rolling updates for deployments, but what if you want to use a Blue-Green approach with Argo CD inside Kubernetes?
+
 Here’s what I ask 👇
 1. How does DNS resolution work inside a pod?
 → And what’s the first thing you check when a service isn’t reachable by name?
