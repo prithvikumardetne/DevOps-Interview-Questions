@@ -2,6 +2,9 @@
 
 # DevOps-Interview-Questions
 
+
+
+
 1️⃣ You mentioned you’ve worked with Argo CD – how do you use it?
 
 2️⃣ There’s a scenario where someone wants to deploy infrastructure on AWS via Terraform. Which tool will you use and why?
