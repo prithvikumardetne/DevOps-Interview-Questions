@@ -2,7 +2,174 @@
 
 # DevOps-Interview-Questions
 
+1. How Does Kubernetes Work Internally? What Happens When You Apply a Manifest?
 
+Act 1: Client Request
+deployment.yaml Creation:
+A user defines the desired state in a YAML manifest. This includes the deployment name, replica count, and the pod specification (e.g., container image, ports).
+kubectl Execution:
+The kubectl apply -f deployment.yaml command is executed.
+kubectl parses the YAML, converts it to a JSON payload, and makes a REST API call to the kube-apiserver.
+
+
+Act 2: Control Plane - Initial Processing
+kube-apiserver Receives Request:
+Authentication: Verifies the identity of the client (e.g., via a user's kubeconfig or a service account token).
+Authorization: Checks if the authenticated client is permitted to perform the requested action (e.g., create a Deployment) on the specified resource, typically using Role-Based Access Control (RBAC).
+Admission Control: Executes a sequence of validation and mutation checks. This ensures the object conforms to cluster policies before it is persisted.
+Persistence to etcd:
+After the request is fully validated, the kube-apiserver writes the Deployment object to the etcd key-value store.
+This write action solidifies the desired state as the cluster's new source of truth. etcd then notifies subscribers (like the API server itself) of the change.
+
+
+Act 3: Control Plane - Reconciliation Loops
+Deployment Controller (in kube-controller-manager):
+Watch: This controller constantly watches the API Server for changes to Deployment objects.
+Goal: To align the actual state with the desired state defined in the Deployment object, primarily by managing ReplicaSet versions.
+Action:
+It evaluates the Deployment and determines a ReplicaSet needs to be created or updated.
+It generates a new ReplicaSet object with a name derived from the Deployment and a Pod template copied from the Deployment's specification.
+It sends this ReplicaSet object to the kube-apiserver to be stored in etcd.
+
+ReplicaSet Controller (in kube-controller-manager):
+Watch: This controller watches for changes to ReplicaSet objects.
+Goal: To ensure that the number of Pods matching its selector always equals the .spec.replicas count.
+Action:
+It compares the desired replica count from its spec (e.g., 3) against the number of currently active Pods it manages (currently 0).
+Based on the difference, it creates the required number of Pod objects from its Pod template.
+It sends these Pod objects to the kube-apiserver. The Pods are stored in etcd in the Pending phase because the .spec.nodeName field is not yet set.
+
+
+Act 4: Control Plane - Scheduling
+kube-scheduler:
+Watch: The scheduler's sole focus is watching for Pod objects that have an empty .spec.nodeName field.
+Goal: To assign each un-scheduled Pod to the most suitable worker Node.
+Action (for each Pod):
+Filtering: It identifies a list of viable Nodes that can run the Pod. This involves checking for constraints like resource requirements (CPU, memory), node selectors, taints/tolerations, and volume compatibility.
+Scoring: It ranks the viable Nodes by applying a set of priority functions. These functions score nodes based on factors like resource utilization or trying to spread Pods across failure domains.
+Binding: It commits to the highest-scoring Node and notifies the kube-apiserver. This action updates the Pod object in etcd, setting the .spec.nodeName to the chosen Node.
+
+
+Act 5: Node-Level Execution
+Kubelet (on the assigned Node):
+Watch: Each Kubelet agent watches the API Server for Pods that have been scheduled to its node.
+Goal: To ensure the containers described in a Pod's specification are running and healthy on its Node.
+Action:
+It detects the new Pod assigned to it.
+It interacts with the Container Runtime (via the Container Runtime Interface - CRI) to perform the following:
+Image Pull: Instructs the runtime to pull the container image (nginx:latest) if it's not cached locally.
+Container Creation: Instructs the runtime to create and run the container based on the image and Pod spec.
+Resource Setup: Configures the Pod's sandbox environment, including setting up networking (via CNI plugin) and mounting any specified data volumes.
+
+Status Reporting:
+The Kubelet continuously monitors the status of the Pod's containers.
+It reports the Pod's status, events, and IP address back to the kube-apiserver, which updates the Pod's .status field in etcd. This makes the state visible to the rest of the cluster.
+The Key Insight: This entire process, from controllers to the scheduler to the kubelet, is a series of reconciliation loops. Each component continuously watches the "desired state" in etcd and works independently to make the "actual state" of the world match it.
+
+2. How Does DNS Resolution Work in Kubernetes?
+
+When a Pod tries to resolve a service name:
+
+- The Pod's /etc/resolv.conf is configured by kubelet to point to CoreDNS (typically at 10.96.0.10 or similar cluster IP).
+- CoreDNS receives the DNS query and checks if it matches the cluster domain pattern (.svc.cluster.local).
+- For cluster services, CoreDNS queries the Kubernetes API to find the Service object and returns its ClusterIP.
+- For external domains, CoreDNS forwards the query to upstream DNS servers (defined in the CoreDNS ConfigMap).
+- The Pod receives the IP and establishes a connection. If it's a Service ClusterIP, kube-proxy (or iptables/IPVS rules) handles the load balancing to backend Pods.
+
+Common Pitfalls:
+
+Using wrong namespace in service name
+CoreDNS ConfigMap misconfiguration for external DNS
+Network policies blocking DNS traffic on port 53
+
+3. Taints/Tolerations vs Node Affinity: When to Use What?
+
+Taints/Tolerations:
+
+Purpose: Repel Pods from nodes unless they explicitly tolerate the taint
+Direction: Node-centric (nodes push away Pods)
+Use Cases:
+- Dedicated nodes for specific workloads (e.g., GPU nodes)
+- Keeping nodes reserved during maintenance
+- Isolating problematic or experimental workloads
+
+
+
+Node Affinity:
+
+Purpose: Attract Pods to specific nodes based on labels
+Direction: Pod-centric (Pods pull toward nodes)
+Use Cases:
+- Placing Pods on nodes with specific hardware (SSD, high-memory)
+- Multi-tenant clusters with customer-specific node pools
+- Co-locating related Pods for performance
+
+4. How Does AWS VPC CNI Work?
+
+The AWS VPC CNI plugin assigns actual VPC IP addresses to Pods:
+
+ENI Attachment: When a node starts, the CNI plugin attaches multiple Elastic Network Interfaces (ENIs) to the EC2 instance.
+IP Pre-allocation: The plugin pre-allocates secondary IP addresses from your VPC subnet to these ENIs.
+Pod Assignment: When a Pod is scheduled, the CNI assigns one of these pre-allocated IPs directly to the Pod.
+Routing: The Pod's traffic flows through the node's ENI, making the Pod routable within the VPC without NAT.
+
+5. How Does CoreDNS Actually Work?
+
+CoreDNS is a plugin-based DNS server deployed as a Deployment in the kube-system namespace:
+
+Listening: CoreDNS Pods listen on port 53 (UDP/TCP) via a Service ClusterIP.
+Plugin Chain: Each request goes through a plugin chain defined in the CoreDNS ConfigMap:
+
+- errors: Logs errors
+- health: Provides health endpoints
+- kubernetes: Handles cluster-internal DNS queries by watching the K8s API for Service and Pod objects
+- forward: Forwards external queries to upstream DNS (e.g., 8.8.8.8)
+- cache: Caches responses to reduce API load
+
+
+Service Discovery in CoreDNS system: 
+- For internal queries, the kubernetes plugin:
+1. Parses the FQDN (e.g., nginx.default.svc.cluster.local)
+2. Queries the API server for the Service in the specified namespace
+3. Returns the ClusterIP as an A record
+
+6. Persistent Volume (PV) Errors and Troubleshooting
+
+   The PV/PVC binding process involves several steps:
+
+PVC Creation: A PersistentVolumeClaim defines the storage requirement (size, access mode, storage class).
+Dynamic Provisioning: If a StorageClass is specified with a provisioner (e.g., EBS CSI driver), it dynamically creates a PV.
+Binding: The PVC binds to a PV that matches its requirements.
+Mounting: The kubelet mounts the volume into the Pod's filesystem.
+
+Common Issues:
+
+No matching PV: Check if StorageClass exists and provisioner is working (kubectl get sc)
+Access mode mismatch: ReadWriteOnce vs ReadWriteMany conflicts
+Quota exceeded: AWS EBS volume limits or storage quotas
+Node affinity: PV is in a different zone than the node (check topology constraints)
+CSI driver issues: Check CSI controller and node driver pods in kube-system
+
+7. How Does ECR Image Pulling Work from EKS Pods?
+
+   The authentication flow for ECR in EKS:
+
+1. Pod Specification: The Pod spec references an ECR image (e.g., 123456789.dkr.ecr.us-east-1.amazonaws.com/my-app:v1).
+2. Kubelet Initiates Pull: The kubelet on the node tells the container runtime to pull the image.
+3. IAM Role Authentication:
+   - If the node has an IAM instance profile, it uses those credentials
+   - If IRSA (IAM Roles for Service Accounts) is configured, the Pod's service account provides credentials
+4. ECR Token: The container runtime (or kubelet credential helper) calls ECR's GetAuthorizationToken API to get a temporary Docker login token.
+5. Image Pull: Using the token, the runtime authenticates to ECR and pulls the image layers.
+6. Caching: The image is cached locally on the node for future use.
+
+Common Issues:
+1. Missing IAM permissions: The node role or IRSA role lacks ecr:GetAuthorizationToken, ecr:BatchGetImage, ecr:GetDownloadUrlForLayer
+2. Wrong region: Image is in a different region than specified in the URL
+3. Private ECR in different account: Need cross-account IAM permissions
+4. Image doesn't exist: Typo in image tag or repository name
+
+   
 
 
 1️⃣ You mentioned you’ve worked with Argo CD – how do you use it?
