@@ -2,6 +2,35 @@
 
 # DevOps-Interview-Questions
 
+1. A critical production system is experiencing frequent outages. How would you identify root causes, improve reliability, and implement long-term fixes?
+
+
+2. Deployment pipelines are slow and error-prone. How would you design and optimize CI/CD pipelines for speed, reliability, and security?
+
+
+3. Infrastructure is not scalable and struggles under peak load. How would you design a scalable and resilient architecture?
+
+
+4. Incidents are not detected early, causing business impact. How would you implement observability (logging, monitoring, tracing) across systems?
+
+
+5. High operational toil is affecting team productivity. How would you automate repetitive tasks and improve efficiency?
+
+
+6. Leadership requires high system availability and defined SLAs/SLOs. How would you design and enforce SRE practices and reliability engineering?
+
+
+7. Multiple teams are deploying inconsistently across environments. How would you standardize infrastructure and deployments using tools like Terraform or Ansible?
+
+
+8. Cloud costs are increasing without clear visibility. How would you optimize cloud usage and implement cost governance in platforms like Amazon Web Services or Microsoft Azure?
+
+
+9. You are tasked with implementing containerization and orchestration. How would you design solutions using Docker and Kubernetes?
+
+
+10. You are leading a platform engineering transformation initiative. How would you define strategy, build internal developer platforms, ensure security, and drive adoption across teams?
+
 1. How Does Kubernetes Work Internally? What Happens When You Apply a Manifest?
 
 Act 1: Client Request
