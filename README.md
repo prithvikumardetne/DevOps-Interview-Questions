@@ -2,6 +2,206 @@
 
 # DevOps-Interview-Questions
 
+1. Core SRE Concepts
+What is the primary goal of SRE?
+Answer: SRE ensures scalable, reliable systems by applying software engineering principles to operations. Key goals include automating repetitive tasks (toil reduction), defining SLIs/SLOs, and balancing innovation with reliability using error budgets.
+Explain the concept of an “error budget.”
+Answer: An error budget quantifies the maximum acceptable downtime for a service. For example, a 99.9% uptime SLO allows 8.76 hours/year downtime. Teams use this budget to prioritize feature releases or reliability improvements.
+What’s the difference between SLI, SLO, and SLA?
+Answer:
+SLI (Service Level Indicator): A measurable metric (e.g., request latency, error rate).
+SLO (Service Level Objective): The target value for an SLI (e.g., 99.95% uptime).
+SLA (Service Level Agreement): A contractual commitment with penalties if SLOs are violated.
+4. How do SREs reduce “toil”?
+Answer: Automating repetitive tasks (e.g., deployments, backups) using tools like Kubernetes or Ansible. For example, replacing manual server scaling with auto-scaling groups.
+
+5. What is the role of blameless post-mortems?
+Answer: To identify systemic issues (not individual blame) and implement preventive measures.
+
+Example: If a deployment fails due to missing tests, the fix might involve improving CI/CD pipelines.
+
+6. What are the “Four Golden Signals” of monitoring?
+Answer:
+
+Latency: Time to serve requests.
+Traffic: Request volume (e.g., queries per second).
+Errors: Rate of failed requests.
+Saturation: Resource utilization (e.g., CPU, memory).
+7. How do SREs handle capacity planning?
+Answer: Analyzing historical data to predict resource needs (e.g., adding nodes to a Kubernetes cluster during peak traffic). Tools like Prometheus forecast usage trends.
+
+8. Explain “Chaos Engineering.”
+Answer: Proactively testing system resilience by simulating failures (e.g., shutting down nodes with Chaos Monkey).
+
+9. SRE vs. DevOps: Key differences?
+Answer:
+
+DevOps focuses on cultural collaboration between dev and ops teams.
+SRE applies engineering rigor to operations (e.g., SLOs, error budgets).
+10. What is “MTTR” and “MTBF”?
+Answer:
+
+MTTR (Mean Time to Recover): Average time to resolve incidents.
+MTBF (Mean Time Between Failures): Average time between system failures.
+12. What is the role of SRE in bridging Development and Operations?
+Answer: SRE merges software engineering with infrastructure management to ensure systems are reliable, scalable, and cost-effective. Key tasks include automating deployments and defining SLOs.
+
+13. What are the key responsibilities of an SRE?
+Answer:
+
+Define and monitor SLIs/SLOs.
+Automate toil (e.g., CI/CD pipelines).
+Conduct blameless post-mortems.
+Optimize cloud resource usage.
+2. Linux/Unix
+How do you troubleshoot high CPU usage?
+Answer:
+Use top or htop to identify resource-heavy processes.
+Profile with strace or perf. Example: A Java app with high CPU might need garbage collection tuning.
+What is the difference between kill -9 and kill -15?
+Answer:
+kill -15 (SIGTERM): Requests graceful shutdown.
+kill -9 (SIGKILL): Forces immediate termination.
+How to check open ports on a Linux server?
+Answer: Use netstat -tuln or ss -tuln. Example: ss -tuln | grep 443 checks HTTPS usage.
+Explain inode in Linux.
+Answer: Stores file metadata (permissions, timestamps). Use df -i to check inode usage.
+What is a zombie process?
+Answer: A terminated process lingering in the process table. Fix by reaping its exit status via the parent process.
+List common Linux signals.
+Answer:
+SIGHUP (1): Reload configurations.
+SIGINT (2): Interrupt process (Ctrl+C).
+SIGKILL (9): Force termination.
+SIGTERM (15): Graceful shutdown.
+How to find files modified in the last 7 days?
+Answer:
+bash
+find /path -type f -mtime -7
+What does lsof do?
+Answer: Lists open files and their processes. Example: lsof /var/log/syslog identifies log access.
+3. Networking
+TCP vs. UDP: Key differences?
+Answer:
+TCP: Reliable, connection-oriented (e.g., HTTP).
+UDP: Unreliable, connectionless (e.g., VoIP).
+Describe the three-way handshake.
+Answer:
+Client sends SYN.
+Server responds with SYN-ACK.
+Client sends ACK.
+What is BGP?
+Answer: Border Gateway Protocol routes traffic between autonomous systems (e.g., internet backbone).
+How does HTTPS work?
+Answer: Encrypts HTTP traffic via TLS:
+Server sends certificate.
+Client verifies it.
+Symmetric key exchange.
+What is a CDN?
+Answer: Content Delivery Network caches static assets globally to reduce latency (e.g., Cloudflare).
+What is DHCP, and why is it used?
+Answer: Dynamically assigns IP addresses to devices, reducing manual configuration errors.
+SNAT vs. DNAT
+Answer:
+SNAT changes the source IP (e.g., private to public IP).
+DNAT changes the destination IP (e.g., routing traffic to a backend server).
+What is ICMP?
+Answer: Internet Control Message Protocol (used by ping for connectivity checks).
+4. Cloud Computing (AWS/GCP/Azure)
+What is AWS Lambda?
+Answer: Serverless compute service for event-driven code (e.g., processing S3 uploads).
+Explain Azure Blob Storage.
+Answer: Scalable object storage for unstructured data (images, logs).
+What is GCP BigQuery?
+Answer: Serverless data warehouse for SQL queries on large datasets.
+How does AWS Auto Scaling work?
+Answer: Automatically adjusts EC2 instances based on demand (e.g., CPU utilization).
+What is Azure Availability Set?
+Answer: Distributes VMs across fault domains to ensure redundancy during hardware failures.
+What is IAM?
+Answer: Identity and Access Management controls permissions for cloud resources.
+5. Docker
+Docker Image vs. Container
+Answer:
+Image: Template with app code and dependencies.
+Container: Running instance of an image.
+How to reduce Docker image size?
+Answer: Use multi-stage builds and Alpine Linux base images.
+What are Docker volumes?
+Answer: Persistent storage for containers (e.g., databases).
+How to secure Docker containers?
+Answer:
+Run containers as non-root users.
+Scan images for vulnerabilities (e.g., Trivy).
+Enable Docker Content Trust.
+6. Kubernetes
+What is a Pod?
+Answer: The smallest deployable unit in Kubernetes, hosting one or more containers.
+Deployment vs. StatefulSet
+Answer:
+Deployment: Manages stateless apps (e.g., web servers).
+StatefulSet: Manages stateful apps (e.g., databases).
+How to scale a Deployment?
+Answer:
+bash
+kubectl scale deployment/myapp --replicas=5
+What is a ConfigMap?
+Answer: Stores non-sensitive configuration data (e.g., environment variables).
+Explain Horizontal Pod Autoscaler (HPA).
+Answer: Scales pods based on CPU/memory usage or custom metrics.
+7. Monitoring & Logging
+Prometheus vs. Grafana
+Answer:
+Prometheus: Collects and stores metrics.
+Grafana: Visualizes metrics via dashboards.
+What is an APM tool?
+Answer: Application Performance Monitoring (e.g., New Relic) tracks latency, errors, and throughput.
+ELK Stack Components
+Answer:
+Elasticsearch: Search/analytics engine.
+Logstash: Data processing pipeline.
+Kibana: Visualization tool.
+What is Jaeger?
+Answer: Distributed tracing tool for microservices (e.g., tracking request flows).
+8. CI/CD
+What is a canary deployment?
+Answer: Roll out changes to a small user subset before full deployment to minimize risk.
+GitLab CI vs. Jenkins
+Answer:
+GitLab CI: Integrated with GitLab.
+Jenkins: Standalone, plugin-driven automation server.
+9. Scripting & Automation
+Write a script to count “ERROR” lines in a log file.
+Answer:
+bash
+grep "ERROR" app.log | wc -l
+How to parse JSON in Python?
+Answer:
+python
+import json
+data = json.loads(json_string)
+10. Incident Management
+Steps to resolve an outage?
+Answer: Detect → Acknowledge → Diagnose → Fix → Post-mortem → Prevent recurrence.
+What is a “playbook”?
+Answer: Step-by-step guide for common incidents (e.g., database failure).
+11. Security & Compliance
+Principle of Least Privilege
+Answer: Grant minimal permissions required for users/roles.
+How to secure SSH?
+Answer: Disable root login, use SSH keys, and enable 2FA.
+12. Coding Challenges
+Find top 5 IPs in a log file.
+Answer:
+bash
+awk '{print $1}' access.log | sort | uniq -c | sort -nr | head -5
+Check if a string is a palindrome (Python).
+Answer:
+python
+def is_palindrome(s):
+return s == s[::-1]
+
+
 1. A critical production system is experiencing frequent outages. How would you identify root causes, improve reliability, and implement long-term fixes?
 
 
