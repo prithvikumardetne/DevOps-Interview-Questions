@@ -2,6 +2,29 @@
 
 # DevOps-Interview-Questions
 
+Round 1 – Streaming at Scale, K8s, Cloud & Linux (45 mins)
+1. How would you design auto-scaling for 50M+ concurrent viewers across multiple K8s clusters without over-provisioning?
+2. During an IPL final, a new region needs to spin up instantly. How would you pre-warm nodes & scale workloads with zero cold-start impact?
+3. Explain how you’d use Envoy + Istio to route low-latency live streams differently from VOD without service restarts.
+4. What’s your approach to multi-zone pod affinity/anti-affinity to ensure a node failure doesn’t impact regional streaming SLAs?
+5. How would you monitor HPA scaling decisions in real-time and detect if the metrics server is lagging?
+6. Describe K8s readiness/liveness probe configs to catch buffering/lag issues in stream-processing microservices before users notice.
+7. A kube-proxy update rolls out mid-match. What’s your network rollback plan to avoid packet drops?
+
+Round 2 – RCA, Fire Drills & Streaming Chaos (75 mins)
+1. Playback failures spike for only 3% of users in the APAC region. CPU, memory, and pods look fine. Could you walk through your triage plan?
+2. Your Kafka ingestion pipeline lags by 2 minutes during a traffic surge. Producers are fine, consumers are idle. What’s your debug path?
+3. Sudden tail latency on Redis-based stream session store during a Champions League match, how do you find & fix the bottleneck?
+4. HPA refuses to scale in a critical podset even though Prometheus shows CPU > 90%. Root cause & fix?
+5. NAT gateway costs double in 24 hours during a live series; no infra changes were made. What could be silently causing it?
+
+Round 3 – Leadership, Reliability Culture & Scaling Influence (30 mins)
+1. How do you build a culture where latency SLOs are enforced like uptime SLAs in a streaming org?
+2. You’re asked to ship a multi-region failover for live events in 2 weeks with no DNS-based routing allowed. What’s your plan?
+3. How would you simulate chaos in a streaming pipeline without risking real user impact?
+4. How do you justify infra costs for pre-warmed scaling capacity to executives before a major sports event?
+
+
 1. Core SRE Concepts
 What is the primary goal of SRE?
 Answer: SRE ensures scalable, reliable systems by applying software engineering principles to operations. Key goals include automating repetitive tasks (toil reduction), defining SLIs/SLOs, and balancing innovation with reliability using error budgets.
